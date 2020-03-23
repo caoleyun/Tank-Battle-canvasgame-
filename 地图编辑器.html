@@ -27,8 +27,8 @@
 			height:32px;
 			border:1px solid red;
 			box-sizing:border-box;
-			top:64px;
-			left:64px;
+			top:32px;
+			left:32px;
 		}
 		.landtype li{
 			float:left;
@@ -139,6 +139,90 @@
 		var base = 32;
 		//绘制的类型编号
 		var landtype = 1;
+		//现在编辑的文件名
+		var noweditfile = "";
+
+		//矩阵
+		var code = (function(){
+			var code = [];
+			for (var i = 0; i < 26; i++) {
+				code.push("00000000000000000000000000");
+			}
+			return code;
+		})();
+
+
+		//页面开始时候 发出ajax请求 请求maps文件夹中所有文件夹
+		readlist();
+		function readlist(){
+			$(".list ul").empty();
+			$.get("php/list.php",function(data){
+				var listArr = JSON.parse(data);
+				for(var i = 0 ; i < listArr.length ; i++){
+					$("<li>" + listArr[i] + "<input type='button' value='编辑' data-file='" + listArr[i] + "' class='editbtn'/></li>").appendTo(".list ul");
+				}			});
+		}
+
+		//事件委托 编辑 按钮的事件
+		$(".list ul").delegate(".editbtn","click",function(){
+			//清空
+			ctx.clearRect(0,0,416,416);
+			//清除 code数组
+			code=(function(){
+				var code=[];
+				for(var i=0;i<26;i++){
+					code.push("00000000000000000000000000");
+				}
+				return code;
+			})();
+
+			$.get("maps/"+$(this).attr("data-file"),function(data){
+				//如果tkm文件是一个空文件，此时不需要渲染，等待保存就行了
+				if(data===""){
+					ctx.clearRect(0,0,416,416);
+					return;
+				}
+				var arr=JSON.parse(data);
+				code=arr;
+
+				for(var i=0;i<26;i++){
+					for(var j=0;j<26;j++){
+						if(arr[i][j]!=0){
+							ctx.drawImage(image,(arr[i][j]-1)*32,0,16,16,j*16,i*16,16,16);
+						}else{
+							ctx.clearRect(j * 16,i * 16,16,16);
+						}
+					}
+				}
+				//画老家
+				ctx.drawImage(image,5*32,0,32,32,6*32,12*32,32,32);
+			})
+
+			//改变现在编辑
+			noweditfile = $(this).attr("data-file");
+			//显示在视图上
+			$("h1").html(noweditfile + "[编辑]")
+		});
+
+		//保存按钮，
+		$("#save").click(function(){
+			$.post("php/write.php",{
+				"dijiguan" : noweditfile,
+				"ditushuzu" : JSON.stringify(code)
+			});
+		});
+
+		$("#chuangjianbtn").click(function(){
+			$.get("php/create.php",function(){
+				readlist();
+			});
+		});
+
+		function changecode(row,col,landtype){
+			code[row] = code[row].substr(0,col) + landtype + code[row].substr(col + 1);
+		}
+
+		// console.log(code);
 
 		var image=new Image();
 		//当图片加载 完成后
@@ -155,11 +239,104 @@
 
 				var row=parseInt(mousey/base);
 				var col=parseInt(mousex/base);
+				if(base==32){
+					row=row>=13?12:row;
+					col=col>=13?12:col;
+				}else{
+					row=row>=26?25:row;
+					col=col>=26?25:col;
+				}
+				// console.log(row,col);
 				//移动红框光标
-				// $(".cursor").css({"left":col*base,"top:"});
+				$(".cursor").css({"left":col*base,"top":row*base});
+			});
+
+			//添加监听 鼠标按下时候 绘制一张图片
+			$(".canvasbox").mousedown(function(event){
+				var mousex=event.clientX- $(".canvasbox").offset().left;;
+				var mousey=event.clientY- $(".canvasbox").offset().top;
+				if(event.pageX){
+					var mousex=event.pageX- $(".canvasbox").offset().left;;
+					var mousey=event.pageY- $(".canvasbox").offset().top;
+				}
+
+				var row=parseInt(mousey/base);
+				var col=parseInt(mousex/base);
+				console.log(row,col,base);
+				//画一张
+				if(landtype!=0){
+					ctx.drawImage(image,(landtype-1)*32,0,base,base,col*base,row*base,base,base);
+					//改变数组，row和col有一个倍数。
+					//比如现在是画大格，base是32，此时要改变4个矩阵。
+					//此时的3行8列，表示左侧是16小列，上方有6个小行。
+					changecode(row * base / 16 , col * base / 16 , landtype);
+					if(base == 32){
+						changecode(row * 2 + 1 ,col * 2 , landtype);
+						changecode(row * 2 , col * 2 + 1, landtype);
+						changecode(row * 2 + 1,col * 2 + 1, landtype);
+					}
+				}else{
+					ctx.clearRect(col*base,row*base,base,base);
+					//改变数组，这一项恢复为0
+					changecode(row * base / 16 , col * base / 16 , "0");
+					if(base == 32){
+						changecode(row * 2 + 1 , col * 2 , "0");
+						changecode(row * 2 , col * 2 + 1 , "0");
+						changecode(row * 2 + 1 , col * 2 + 1 , "0");
+					}
+				}
+
+				$(".canvasbox").mousemove(function(event){
+					var mousex=event.clientX- $(".canvasbox").offset().left;;
+					var mousey=event.clientY- $(".canvasbox").offset().top;
+					if(event.pageX){
+						var mousex=event.pageX- $(".canvasbox").offset().left;;
+						var mousey=event.pageY- $(".canvasbox").offset().top;
+					}
+
+					var row=parseInt(mousey/base);
+					var col=parseInt(mousex/base);
+
+					if(landtype!=0){
+						ctx.drawImage(image,(landtype - 1) * 32,0,base,base,col * base,row * base,base,base);
+						//改变数组
+						changecode(row * base / 16 , col * base / 16 , landtype);
+						if(base == 32){
+							changecode(row * 2 + 1 ,col * 2 , landtype);
+							changecode(row * 2 , col * 2 + 1, landtype);
+							changecode(row * 2 + 1,col * 2 + 1, landtype);
+						}
+					}else{
+						ctx.clearRect(col*base,row*base,base,base);
+						//改变数组
+						 changecode(row * base / 16 , col * base / 16 , "0");
+						if(base == 32){
+							changecode(row * 2 + 1 , col * 2 , "0");
+							changecode(row * 2 , col * 2 + 1 , "0");
+							changecode(row * 2 + 1 , col * 2 + 1 , "0");
+						}
+					}
+				});
 
 			});
-		}
+
+
+			//鼠标按下松开 移除 画图监听
+			$(".canvasbox").mouseup(function(event){
+				$(".canvasbox").off("mousemove");
+				console.log(code);
+			});
+
+			//给 landtype 四个li添加监听 点到谁 信号量就变成几
+			$(".landtype li").click(function(){
+				//从身上取值
+				landtype=parseInt($(this).attr("data-landtype"));
+				base=parseInt($(this).attr("data-base"));
+				$(this).addClass("cur").siblings().removeClass("cur");
+				//改变光标大小
+				$(".cursor").css({"width":base,"height":base});
+			});
+		}	
 		image.src = "R/images/block.bmp";
 	</script>
 
