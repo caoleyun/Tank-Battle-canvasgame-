@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>坦克大战</title>
+	<style type="text/css">
+		*{
+			margin:0;
+			padding:0;
+		}
+		body,html{
+			height:100%;
+		}
+		.canvasbox{
+			width:416px;
+			height:416px;
+			margin:10px;
+			position:relative;
+		}
+		canvas{
+			border:1px solid #333;
+			background-color:black;
+		}
+		.cursor{
+			position:absolute;
+			width:32px;
+			height:32px;
+			border:1px solid red;
+			box-sizing:border-box;
+			top:64px;
+			left:64px;
+		}
+		.landtype li{
+			float:left;
+			width:32px;
+			height:32px;
+			margin-right:10px;
+			background:url(R/images/block.bmp);
+			box-sizing:border-box;
+		}
+		.landtype{
+			list-style:none;
+			margin:10px;
+			overflow: hidden;
+		}
+		.landtype li.no1{
+			background-position: 0 0;
+		}
+		.landtype li.no2{
+			background-position: -32px 0;
+		}
+		.landtype li.no3{
+			background-position: -64px 0;
+		}
+		.landtype li.no4{
+			background-position: -96px 0;
+		}
+		.landtype li.no5{
+			background:black;
+		}
+		.landtype li.cur{
+
+			border:3px solid red;
+		}
+		.landtype li.small{
+			width:16px;
+			height:16px;
+		}
+		.btn{
+			width:100px;
+			height:60px;
+			background-color:skyblue;
+		}
+		.list{
+			float:left;
+			width:260px;
+			height:100%;
+			border-right:1px solid #333;
+		}
+		.list li{
+			font-size:30px;
+			line-height:30px;
+			padding-left:20px;
+		}
+		.list  li.cur{
+			color:red;
+		}
+		.main{
+			float:left;
+			width:460px;
+			padding-left:100px;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="list">
+		当前本地maps文件地图：
+		<ul></ul>
+		<input type="button" value="创建一个新地图" id="chuangjianbtn" />
+	</div>
+
+	<div class="main">
+
+		<h1></h1>
+
+		<div class="tip">
+			<p>信号量 landtype值 ： 1-砖头 2-刚块 3-草地 4-水面 0-无</p>
+		</div>
+
+		<div class="tools">
+			<ul class="landtype">
+				<li class="no1 cur" data-landtype="1" data-base="32"></li>
+				<li class="no1 small" data-landtype="1" data-base="16"></li>
+				<li class="no2" data-landtype="2" data-base="32"></li>
+				<li class="no2 small" data-landtype="2" data-base="16"></li>
+				<li class="no3" data-landtype="3" data-base="32"></li>
+				<li class="no4" data-landtype="4" data-base="32"></li>
+				<li class="no5" data-landtype="0" data-base="32"></li>
+			</ul>
+
+		</div>
+
+		<div class="canvasbox">
+			<span class="cursor"></span>
+			<canvas width="416" height="416"></canvas>
+		</div>
+
+		<input type="button" value="保存" class="btn" id="save" />
+
+	</div>
+
+	<script src="js/jquery-2.1.4.min.js"></script>
+	<script type=text/javascript>
+		var canvas=$("canvas").get(0);//转为原生对象
+		var ctx=canvas.getContext("2d");
+
+		//绘制的大小
+		var base = 32;
+		//绘制的类型编号
+		var landtype = 1;
+
+		var image=new Image();
+		//当图片加载 完成后
+		image.onload=function(){
+			//画老家
+			ctx.drawImage(image,5*32,0,32,32,6*32,12*32,32,32);
+			//添加监听鼠标移动的时候让cursor span同时移动，模拟成鼠标的样子
+			//这里我们没有给canvasbox添加监听，而是给canvas添加了监听，理由有二：
+			//① 因为canvas和span是兄弟节点，所以我们监听mousex和mousey的时候，兄弟节点之间是不会互相影响的，所以可以不用曲线救国；
+			//② 因为一会儿“拖拽模型”要移除canvasbox上的mousemove事件，所以如果这个监听也监听canvasbox，它就会躺枪。这个事件监听也会被清除
+			$("canvas").mousemove(function(event){
+				var mousex=event.offsetX;
+				var mousey=event.offsetY;
+
+				var row=parseInt(mousey/base);
+				var col=parseInt(mousex/base);
+				//移动红框光标
+				// $(".cursor").css({"left":col*base,"top:"});
+
+			});
+		}
+		image.src = "R/images/block.bmp";
+	</script>
+
+</body>
+</html>
