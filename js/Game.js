@@ -9,7 +9,7 @@
 		//帧编号
 		this.fno=0;
 		//关卡编号
-		this.stage=3;
+		this.stage=4;
 		//读取资源
 		var self=this;
 		//读取资源是一个异步函数，所以我们不知道什么时候执行完毕。但是其他的事情必须等到他完毕之后再执行，必须用回调函数。
@@ -69,8 +69,9 @@
 		//实例化玩家
 		this.player1=new Player();
 		//实例化 敌人（一会儿变成数组）；
-		this.enermyarr = [new Enermy(),new Enermy(),new Enermy(),new Enermy() ,new Enermy(),new Enermy() ,new Enermy(),new Enermy() ,new Enermy(),new Enermy() ];
+		this.enermyarr = [new Enermy(),new Enermy() ];
 		// console.log(this.map);
+		// this.enermyarr = [new Enermy()];
 		
 		this.enermy=[];
 		//设置定时器
@@ -85,11 +86,33 @@
 				// console.log(self.enermyarr[i]);
 				// self.enermyarr[i].render();
 				self.enermy[i]=self.enermyarr[i];
+				//以时间为基础 定时改变敌人的方向
+				if(self.fno%100==0){
+					self.enermy[i].changeDirection();	
+				}
 				self.enermy[i].update();
 				self.enermy[i].render();
 			}
+
 			//渲染地图
 			self.map.render();
+
+			//如果
+			// console.log(Math.abs(self.enermy[0].x-self.enermy[1].x));
+			if((Math.abs(self.enermy[0].x-self.enermy[1].x)<=28)&&(Math.abs(self.enermy[0].y-self.enermy[1].y)==0)){
+				var directionArr=["U","R","D","L"];
+				var num=(parseInt(Math.random()*4));
+				if(num!=self.enermy[0].directionNumber){
+					self.enermy[0].changeDirection(directionArr[num]);
+					// self.enermy[1].changeDirection(directionArr[num]);	
+				}else{
+					self.enermy[0].changeDirection(directionArr[(self.enermy[0].directionNumber+2)%4]);
+					// self.enermy[1].changeDirection(directionArr[(self.enermy[0].directionNumber+2)%4]);	
+				}
+				// console.log((self.enermy[0].directionNumber+2)%4,self.enermy[0].direction);
+				// self.enermy[0].changeDirection();	
+				// 	
+			}
 
 			//帧编号
 			self.fno++;

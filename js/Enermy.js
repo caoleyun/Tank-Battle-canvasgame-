@@ -8,7 +8,7 @@
 		//随机一个方向
 		this.direction ="D";
 		this.directionNumber = 2;
-		this.changeDirection();
+		// this.changeDirection();
 		//速度
 		this.speed = 3;
 		//履带状态0、1
@@ -16,7 +16,7 @@
 		//自己的子弹，游戏规定，一个子弹没有消失的时候，不能继续开火。
 		this.bullet = null;
 		//防止自己在同一个路口多次判断，此时就加一个锁
-		this.lock = false;
+		this.lock = true;
 		//上锁的这一帧的帧编号
 		this.lockfno = 0;
 	}
@@ -24,19 +24,29 @@
 	// //随机选择方向
 	Enermy.prototype.changeDirection = function (str){
 		var directionArr=["U","R","D","L"];
-		var num=(parseInt(Math.random()*55)+game.fno+1)%4;
+		var num=(parseInt(Math.random()*4));
 		// console.log(num);
-		// var num=game.fno%4;
-		this.directionNumber = num;
 
 		//拉倒16的倍数上面去
 		if(directionArr[num]!=this.direction){
 			this.x = Math.round(this.x / 16) * 16;
 			this.y = Math.round(this.y / 16) * 16;
 		}
+
+		if(str!=null){
+			for(var i=0;i<4;i++){
+				if(directionArr[i]==str){
+					this.directionNumber=i;
+					break;
+				}
+			}
+		}else{
+			this.directionNumber = num;
+		}
 		this.direction= str==null ? directionArr[num] : str ;
 
-		// console.log(this.directionNumber,this.direction);
+
+		// console.log(this.directionNumber,this.direction,str);
 		// console.log();
 	}
 
@@ -58,7 +68,7 @@
 		 
 			this.lock = true;
 		}
-
+		// console.log(this.lock);
 		// console.log(this.direction);
 		//验证即将达到的16*16小格上是不是空气、草地
 		//试着减去一下
@@ -103,7 +113,7 @@
 			return;
 		}
 
-		// console.log(this.direction);
+		// console.log("update"+this.direction);
 		//看看地图上这里有没有东西
 		switch(this.direction){
 			case "U" :
@@ -113,7 +123,7 @@
 					(row + 1 < 26 && (game.map.code[row + 1][col + 2] == 0 || game.map.code[row + 1][col + 2] == 3))
 				){
 					if(this.lock && Math.random() > 0.5){
-						 
+						 // console.log("上-右");
 						this.changeDirection("R");
 					}
 					this.lock = false;
@@ -125,6 +135,7 @@
 					(row + 1 < 26 && (game.map.code[row + 1][col] == 0 || game.map.code[row + 1][col] == 3))
 				){
 					if(this.lock && Math.random() > 0.5){
+						// console.log("上-左");
 						this.changeDirection("L");
 					}
 					this.lock = false;
@@ -136,7 +147,8 @@
 				if(
 					game.map.code[row][col] != 0 && game.map.code[row][col] != 3 ||
 					col + 1 < 26 && (game.map.code[row][col + 1] != 0 && game.map.code[row][col + 1] != 3)
-				){
+				){	
+					// console.log("上-？");
 					this.changeDirection();
 					return;
 				}
@@ -149,6 +161,7 @@
 				){	
 			 		 
 					if(this.lock && Math.random() > 0.5){
+						// console.log("右-上");
 						this.changeDirection("U");
 					}
 					this.lock = false;
@@ -161,7 +174,7 @@
 				){
 					 
 					if(this.lock && Math.random() > 0.5){
-						
+						// console.log("右-下");
 						this.changeDirection("D");
 					}
 					this.lock = false;
@@ -173,6 +186,7 @@
 					col + 2 < 26 && (game.map.code[row][col + 2] != 0 && game.map.code[row][col + 2] != 3) ||
 					row + 1 < 26 && (game.map.code[row + 1][col + 2] != 0 && game.map.code[row + 1][col + 2] != 3)
 				){
+					// console.log("右-？");
 					this.changeDirection();
 					return;
 				}
@@ -184,7 +198,7 @@
 					(row + 1 < 26 && game.map.code[row + 1][col + 2] == 0 || game.map.code[row + 1][col + 2] == 3)
 				){
 					if(this.lock && Math.random() > 0.5){
-						 
+						// console.log("下-右",game.fno);
 						this.changeDirection("R");
 					}
 					this.lock = false;
@@ -196,6 +210,7 @@
 					(row + 1 < 26 && game.map.code[row + 1][col] == 0 || game.map.code[row + 1][col] == 3)
 				){
 					if(this.lock && Math.random() > 0.5){
+						// console.log("下-左");
 						this.changeDirection("L");
 					}
 					this.lock = false;
@@ -208,6 +223,7 @@
 					row + 2 < 26 && (game.map.code[row + 2][col] != 0 && game.map.code[row + 2][col] != 3) ||
 					row + 2 < 26 && (game.map.code[row + 2][col + 1] != 0 && game.map.code[row + 2][col + 1] != 3)
 				){
+					// console.log("下-？");
 					this.changeDirection();
 					return;
 				}
@@ -220,6 +236,7 @@
 				){	
 			 		 
 					if(this.lock && Math.random() > 0.5){
+						// console.log("左-上");
 						this.changeDirection("U");
 					}
 					this.lock = false;
@@ -232,7 +249,7 @@
 				){
 					 
 					if(this.lock && Math.random() > 0.5){
-						
+						// console.log("左-下");
 						this.changeDirection("D");
 					}
 					this.lock = false;
@@ -244,6 +261,7 @@
 					game.map.code[row][col] != 0 && game.map.code[row][col] != 3 ||
 					row + 1 < 26 && (game.map.code[row + 1][col] != 0 && game.map.code[row + 1][col] != 3)
 				){
+					// console.log("左-？");
 					this.changeDirection();
 					return;
 				}
