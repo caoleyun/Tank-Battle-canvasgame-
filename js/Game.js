@@ -85,6 +85,7 @@
 				// console.log(self.enermyarr[i]);
 				// self.enermyarr[i].render();
 				self.enermy[i]=self.enermyarr[i];
+				self.enermy[i].update();
 				self.enermy[i].render();
 			}
 			//渲染地图

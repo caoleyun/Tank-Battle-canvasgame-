@@ -16,7 +16,7 @@
 			this.directionNumber = 3;
 		}
 		//速度
-		this.speed = 10;
+		this.speed = 8;
 		//拥有者
 		this.owner = owner;
 	}
