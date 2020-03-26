@@ -1,9 +1,9 @@
 (function(){
-	var Enermy=window.Enermy=function(){
+	var Enermy=window.Enermy=function(x,y){
 		this.image = game.R["enemy"];
 		//位置。注意，坦克在拐弯的时候，x、y都会被自动修正到16的倍数上去
-		this.x = 0;
-		this.y = 0;
+		this.x = x==null?0:x;
+		this.y = y==null?0:y;
 		//方向URDL
 		//随机一个方向
 		this.direction ="D";
@@ -63,17 +63,28 @@
 
 	//更新敌人
 	Enermy.prototype.update=function(){
+
 		//锁如果已经超过了32像素应有的帧数，开锁
 		if((game.fno - this.lockfno) > parseInt(32 / this.speed)){
 		 
 			this.lock = true;
 		}
+
+		
+
 		// console.log(this.lock);
 		// console.log(this.direction);
 		//验证即将达到的16*16小格上是不是空气、草地
 		//试着减去一下
 		this._y = this.y;
 		this._x = this.x;
+		//前一帧的 行数和列数
+		this.preRow=parseInt(this._y / 16);
+		this.preCol=parseInt(this._x / 16);
+
+
+		
+		 
 		switch(this.direction){
 			case "U" :
 				this._y = this.y - this.speed;
@@ -91,6 +102,11 @@
 		//看看试着减去的这个东西对应的地图位置
 		var row = parseInt(this._y / 16);
 		var col = parseInt(this._x / 16);
+		this.row=row;
+		this.col=col;
+
+
+
 		// console.log(row,col);
 		if(this._y > 16 * 24){
 			this.y = 16 * 24;
@@ -142,11 +158,16 @@
 					this.lockfno = game.fno;
 				}
 
+				//如果
+				// if(){
+
+				// }
+
 
 				//向上走，正前方有没有人阻挡我
 				if(
 					game.map.code[row][col] != 0 && game.map.code[row][col] != 3 ||
-					col + 1 < 26 && (game.map.code[row][col + 1] != 0 && game.map.code[row][col + 1] != 3)
+					col + 1 < 26 && (game.map.code[row][col + 1] != 0 && game.map.code[row][col + 1] != 3 )
 				){	
 					// console.log("上-？");
 					this.changeDirection();
@@ -180,6 +201,7 @@
 					this.lock = false;
 					this.lockfno = game.fno;
 				}
+
 
 				//向右走，正前方有没有人阻挡我
 				if(
@@ -258,8 +280,8 @@
 				
 				//向左走，正前方有没有人阻挡我
 				if(
-					game.map.code[row][col] != 0 && game.map.code[row][col] != 3 ||
-					row + 1 < 26 && (game.map.code[row + 1][col] != 0 && game.map.code[row + 1][col] != 3)
+					game.map.code[row][col] != 0 && game.map.code[row][col] != 3  ||
+					row + 1 < 26 && (game.map.code[row + 1][col] != 0 && game.map.code[row + 1][col] != 3 )
 				){
 					// console.log("左-？");
 					this.changeDirection();
@@ -285,6 +307,9 @@
 				break;
 		}
 
+
+		 
+
 		//履带状态
 		this.step = this.step == 0 ? 1 : 0;
 		 
@@ -296,13 +321,22 @@
 
 	//渲染敌人
 	Enermy.prototype.render=function(){
+
+		
+
+		 // game.map.changecode(this.preRow,this.preCol,0);
+		 // game.map.changecode(this.preRow+1,this.preCol,0);
+		 // game.map.changecode(this.preRow,this.preCol+1,0);
+		 // game.map.changecode(this.preRow+1,this.preCol+1,0);
+	
+
 		//渲染自己
 		game.ctx.drawImage(this.image,28 * this.step,28 * this.directionNumber,28,28,this.x +2,this.y+2 ,28,28);
-		//渲染子弹
+		// //渲染子弹
 		if(this.bullet){
 			this.bullet.render();
 		}else{
-			this.fire();
+			this.fire();/**game.fno%10==0 && */
 		}
 	}
 

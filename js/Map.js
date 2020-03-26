@@ -20,7 +20,7 @@
 		}
 	}
 
-	//改变某个字符
+	//改变某个字符  0-无 1-砖头 2-刚块 3-草地 4-水面 
 	Map.prototype.changecode=function(row,col,landtype){
 		this.code[row]=this.code[row].substr(0,col)+landtype+this.code[row].substr(col+1);
 	}

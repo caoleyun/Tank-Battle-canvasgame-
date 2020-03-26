@@ -9,7 +9,17 @@
 		//帧编号
 		this.fno=0;
 		//关卡编号
-		this.stage=4;
+		this.stage=6;
+		//当前地图上的精灵元素的 元素地图
+		// this.spiritCode= (function(){
+		// 	var code = [];
+		// 	for (var i = 0; i < 26; i++) {
+		// 		code.push("00000000000000000000000000");
+		// 	}
+		// 	return code;
+		// })();
+
+
 		//读取资源
 		var self=this;
 		//读取资源是一个异步函数，所以我们不知道什么时候执行完毕。但是其他的事情必须等到他完毕之后再执行，必须用回调函数。
@@ -19,6 +29,11 @@
 			self.bindEvent();
 		});
 	}
+
+	//改变某个字符 0-无 1-砖头 2-刚块 3-草地 4-水面 5- 水面 6-老家 7-死的老家 8-自己 9-敌人
+	// Game.prototype.changeSpiritCode=function(row,col,landtype){
+	// 	this.spiritCode[row]=this.spiritCode[row].substr(0,col)+landtype+this.spiritCode[row].substr(col+1);
+	// }
 
 	//读取资源
 	Game.prototype.loadAllResource=function(callback){
@@ -66,53 +81,79 @@
 		var self=this;
 		//实例化自己的地图类
 		this.map=new Map();
-		//实例化玩家
-		this.player1=new Player();
+		//实例化玩家 
+		this.playerarr=[new Player()];
 		//实例化 敌人（一会儿变成数组）；
-		this.enermyarr = [new Enermy(),new Enermy() ];
-		// console.log(this.map);
-		// this.enermyarr = [new Enermy()];
+		this.enermyarr = [new Enermy(0,0),new Enermy(64,0)];/*,new Enermy(64,0) */
 		
-		this.enermy=[];
+
+		//将玩家和敌人放入一个数字 用于自我碰撞检测
+		this.spiritArr=[];
+		this.spiritArr=this.playerarr.concat(this.enermyarr);
+
+
 		//设置定时器
 		this.timer=setInterval(function(){
 			//清屏
 			self.ctx.clearRect(0,0,self.canvas.width,self.canvas.height);
+
+			var playerArr=playerarr;
+			var enermyArr=enermyarr;
+			// //剔除自己的元素
+			// for(var i=0;i<nowArr.length;i++){
+
+			// }
 			//更新玩家、渲染玩家
-			self.player1.update();
-			self.player1.render();
+			for(var i=0;i<self.playerarr.length;i++){
+
+				playerArr=playerArr.splice(0,i-1).concat(playerArr.splice(i+1,self.playerArr.length));
+
+				// nowArr=this.playerarr.concat(this.enermyarr)
+				for(var j=0;j<self.spiritArr.length;j++){
+
+					//判断 敌人是否碰撞敌人
+					// if((Math.abs(self.playerarr[i].x-self.spiritArr[j].x)<=33)&&(Math.abs(self.playerarr[i].y-self.spiritArr[1].y)<=33)){
+					// 	var directionArr=["U","R","D","L"];
+					// 	self.playerarr[i].changeDirection(directionArr[(self.playerarr[i].directionNumber+2)%4]);	
+
+					// }
+				}
+				self.playerarr[i].update();
+				self.playerarr[i].render();
+			}
+
 			//渲染敌人
 			for(var i=0;i<self.enermyarr.length;i++){
-				// console.log(self.enermyarr[i]);
-				// self.enermyarr[i].render();
-				self.enermy[i]=self.enermyarr[i];
+				
 				//以时间为基础 定时改变敌人的方向
 				if(self.fno%100==0){
-					self.enermy[i].changeDirection();	
+					self.enermyarr[i].changeDirection();	
 				}
-				self.enermy[i].update();
-				self.enermy[i].render();
+				for(var j=0;j<;j++){
+
+				}
+
+				for(var j=0;j<self.spiritArr.length;j++){
+					//判断 敌人是否碰撞敌人
+					if((Math.abs(self.enermyarr[i].x-self.spiritArr[j].x)<=33)&&(Math.abs(self.enermyarr[i].y-self.spiritArr[1].y)<=33)){
+						console.log("?");
+						var directionArr=["U","R","D","L"];
+						self.enermyarr[i].changeDirection(directionArr[(self.enermyarr[i].directionNumber+2)%4]);	
+
+					}
+				}
+
+
+				self.enermyarr[i].update();
+				self.enermyarr[i].render();
+
 			}
+
 
 			//渲染地图
 			self.map.render();
 
-			//如果
-			// console.log(Math.abs(self.enermy[0].x-self.enermy[1].x));
-			if((Math.abs(self.enermy[0].x-self.enermy[1].x)<=28)&&(Math.abs(self.enermy[0].y-self.enermy[1].y)==0)){
-				var directionArr=["U","R","D","L"];
-				var num=(parseInt(Math.random()*4));
-				if(num!=self.enermy[0].directionNumber){
-					self.enermy[0].changeDirection(directionArr[num]);
-					// self.enermy[1].changeDirection(directionArr[num]);	
-				}else{
-					self.enermy[0].changeDirection(directionArr[(self.enermy[0].directionNumber+2)%4]);
-					// self.enermy[1].changeDirection(directionArr[(self.enermy[0].directionNumber+2)%4]);	
-				}
-				// console.log((self.enermy[0].directionNumber+2)%4,self.enermy[0].direction);
-				// self.enermy[0].changeDirection();	
-				// 	
-			}
+
 
 			//帧编号
 			self.fno++;
@@ -131,25 +172,25 @@
 		$(document).keydown(function(event){
 
 			if(event.keyCode==38){
-				self.player1.changeDirection("U");
-				self.player1.isMoving=true;				
+				self.playerarr[0].changeDirection("U");
+				self.playerarr[0].isMoving=true;				
 			}else if(event.keyCode==39){
-				self.player1.changeDirection("R");
-				self.player1.isMoving=true;	
+				self.playerarr[0].changeDirection("R");
+				self.playerarr[0].isMoving=true;	
 			}else if(event.keyCode==40){
-				self.player1.changeDirection("D");
-				self.player1.isMoving=true;	
+				self.playerarr[0].changeDirection("D");
+				self.playerarr[0].isMoving=true;	
 			}else if(event.keyCode==37){
-				self.player1.changeDirection("L");
-				self.player1.isMoving=true;	
+				self.playerarr[0].changeDirection("L");
+				self.playerarr[0].isMoving=true;	
 			}else if(event.keyCode==32){
 				//按下 空格 开火
-				self.player1.fire();
+				self.playerarr[0].fire();
 			}
 		});
 
 		$(document).keyup(function(event){
-			self.player1.isMoving = false;
+			self.playerarr[0].isMoving = false;
 		});
 	}
 

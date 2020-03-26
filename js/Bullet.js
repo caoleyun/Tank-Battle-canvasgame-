@@ -1,8 +1,8 @@
 (function(){
-	var Bullet=window.Bullet=function(x,y,direction,owner){
-		this.image=game.R["bullet"];
-		//位置 注意坦克在拐弯时候 x,y自动修改成16的倍数
-		this.x=x==0?8:x;
+	var Bullet = window.Bullet = function(x,y,direction,owner){
+		this.image = game.R["bullet"];
+		//位置。注意，坦克在拐弯的时候，x、y都会被自动修正到16的倍数上去
+		this.x = x == 0 ? 8 : x;
 		this.y = y == 0 ? 8 : y;
 		//方向URDL
 		this.direction = direction;
@@ -17,17 +17,15 @@
 		}
 		//速度
 		this.speed = 8;
+		//履带状态0、1
+		this.step = 0;
 		//拥有者
 		this.owner = owner;
 	}
 
-	//渲染子弹
-	Bullet.prototype.render = function(){
-		game.ctx.drawImage(this.image,0,16 * this.directionNumber,16,16,this.x,this.y,16,16);
-	}
-
-	//更新子弹
-	Bullet.prototype.update=function(){
+	//更新玩家
+	Bullet.prototype.update = function(){
+		 
 		//验证即将达到的16*16小格上是不是空气、草地
 		//试着减去一下
 		this._y = this.y;
@@ -69,7 +67,6 @@
 			this.owner.bullet = null;
 			return;
 		}
-
 		//看看地图上这里有没有东西
 		switch(this.direction){
 			case "U" :
@@ -177,8 +174,9 @@
 				this.x -= this.speed;
 				break;
 		}
-
 	}
-	
-
+	//渲染子弹
+	Bullet.prototype.render = function(){
+		game.ctx.drawImage(this.image,0,16 * this.directionNumber,16,16,this.x,this.y,16,16);
+	}
 })();

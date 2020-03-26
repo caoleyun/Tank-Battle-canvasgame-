@@ -101,32 +101,32 @@
 				case "U" :
 					//阻挡
 					if(
-						game.map.code[row][col] != 0 && game.map.code[row][col] != 3 
-						||game.map.code[row][col + 1] != 0 && game.map.code[row][col + 1] != 3
+						game.map.code[row][col] != 0 && game.map.code[row][col] != 3 && game.map.code[row][col] != 5 && game.map.code[row][col] != 6
+						||game.map.code[row][col + 1] != 0 && game.map.code[row][col + 1] != 3 && game.map.code[row][col + 1] != 5 && game.map.code[row][col + 1] != 6
 					){
 						return;
 					}
 					break;
 				case "R" :
 					if(
-						game.map.code[row][col + 2] != 0 && game.map.code[row][col + 2] != 3 
-						|| row + 1 < 26 && game.map.code[row + 1][col + 2] != 0 && game.map.code[row + 1][col + 2] != 3
+						game.map.code[row][col + 2] != 0 && game.map.code[row][col + 2] != 3  && game.map.code[row][col + 2] != 5 && game.map.code[row][col + 2] != 6
+						|| row + 1 < 26 && game.map.code[row + 1][col + 2] != 0 && game.map.code[row + 1][col + 2] != 3 &&game.map.code[row + 1][col + 2] != 5 && game.map.code[row + 1][col + 2] != 6
 					){
 						return;
 					}
 					break;
 				case "D" :
 					if(
-						row + 2 < 26 && game.map.code[row + 2][col] != 0 && game.map.code[row + 2][col] != 3
-						 ||row + 2 < 26 && game.map.code[row + 2][col + 1] != 0 && game.map.code[row + 2][col + 1] != 3
+						row + 2 < 26 && game.map.code[row + 2][col] != 0 && game.map.code[row + 2][col] != 3 && game.map.code[row + 2][col] != 5 && game.map.code[row + 2][col] != 6
+						 ||row + 2 < 26 && game.map.code[row + 2][col + 1] != 0 && game.map.code[row + 2][col + 1] != 3 && game.map.code[row + 2][col + 1] != 5 && game.map.code[row + 2][col + 1] != 6
 					){
 						return;
 					}
 					break;
 				case "L" :
 					if(
-						game.map.code[row][col] != 0 && game.map.code[row][col] != 3 
-						||row + 1 < 26 &&game.map.code[row + 1][col] != 0 && game.map.code[row + 1][col] != 3
+						game.map.code[row][col] != 0 && game.map.code[row][col] != 3 && game.map.code[row][col] != 5 && game.map.code[row][col] != 6
+						||row + 1 < 26 &&game.map.code[row + 1][col] != 0 && game.map.code[row + 1][col] != 3 && game.map.code[row + 1][col] != 5 && game.map.code[row + 1][col] != 6
 					){
 						return;
 					}
