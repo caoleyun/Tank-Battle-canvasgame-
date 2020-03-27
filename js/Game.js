@@ -9,16 +9,8 @@
 		//帧编号
 		this.fno=0;
 		//关卡编号
-		this.stage=6;
-		//当前地图上的精灵元素的 元素地图
-		// this.spiritCode= (function(){
-		// 	var code = [];
-		// 	for (var i = 0; i < 26; i++) {
-		// 		code.push("00000000000000000000000000");
-		// 	}
-		// 	return code;
-		// })();
-
+		this.stage=3;
+		
 
 		//读取资源
 		var self=this;
@@ -87,9 +79,7 @@
 		this.enermyarr = [new Enermy(0,0),new Enermy(64,0)];/*,new Enermy(64,0) */
 		
 
-		//将玩家和敌人放入一个数字 用于自我碰撞检测
-		this.spiritArr=[];
-		this.spiritArr=this.playerarr.concat(this.enermyarr);
+
 
 
 		//设置定时器
@@ -97,52 +87,110 @@
 			//清屏
 			self.ctx.clearRect(0,0,self.canvas.width,self.canvas.height);
 
-			var playerArr=playerarr;
-			var enermyArr=enermyarr;
-			// //剔除自己的元素
-			// for(var i=0;i<nowArr.length;i++){
-
-			// }
 			//更新玩家、渲染玩家
 			for(var i=0;i<self.playerarr.length;i++){
+				
+				var spiritArr=[];
 
-				playerArr=playerArr.splice(0,i-1).concat(playerArr.splice(i+1,self.playerArr.length));
+				//将自己的速度变回原来速度
+				self.playerarr[i].speed=3;
 
-				// nowArr=this.playerarr.concat(this.enermyarr)
-				for(var j=0;j<self.spiritArr.length;j++){
-
-					//判断 敌人是否碰撞敌人
-					// if((Math.abs(self.playerarr[i].x-self.spiritArr[j].x)<=33)&&(Math.abs(self.playerarr[i].y-self.spiritArr[1].y)<=33)){
-					// 	var directionArr=["U","R","D","L"];
-					// 	self.playerarr[i].changeDirection(directionArr[(self.playerarr[i].directionNumber+2)%4]);	
-
-					// }
+				//剔除 自己
+				for(var k=0;k<self.playerarr.length;k++){
+					if(i!=k){
+						spiritArr.push(self.playerarr[k]);
+					}
 				}
+				spiritArr=spiritArr.concat(self.enermyarr);
+				// console.log(spiritArr);
+
+
+				for(var j=0;j<spiritArr.length;j++){
+					//判断 敌人是否碰撞敌人
+					if(
+						(Math.abs(self.playerarr[i].x-spiritArr[j].x)<=32)&&(Math.abs(self.playerarr[i].y-spiritArr[j].y)<=32)
+					){
+
+						//判断自己的方向
+						// switch(self.playerarr[i].direction){
+						// 	case "U":
+						// 		console.log("U");
+						// 		self.playerarr[i].y=self.playerarr[i].y+3;
+						// 		break;
+						// 	case "R":
+						// 		console.log("R");
+						// 		self.playerarr[i].x=self.playerarr[i].x-3;
+						// 		break;
+						// 	case "D":
+						// 		console.log("D");
+						// 		self.playerarr[i].y=self.playerarr[i].y-3;
+						// 		break;
+						// 	case "L":
+						// 		console.log("L");
+						// 		self.playerarr[i].x=self.playerarr[i].x+3;
+						// 		break;
+						// }
+
+						// self.playerarr[i].isMoving=false;
+						self.playerarr[i].speed=0;
+
+					}
+				}
+
+				//在进一步前进时 判断会不会 碰撞 如果碰撞 就
+				
 				self.playerarr[i].update();
 				self.playerarr[i].render();
 			}
 
 			//渲染敌人
 			for(var i=0;i<self.enermyarr.length;i++){
+
+				var spiritArr=[];
 				
 				//以时间为基础 定时改变敌人的方向
 				if(self.fno%100==0){
 					self.enermyarr[i].changeDirection();	
 				}
-				for(var j=0;j<;j++){
 
+				//剔除 自己
+				for(var k=0;k<self.enermyarr.length;k++){
+					if(i!=k){
+						spiritArr.push(self.enermyarr[k]);
+					}
 				}
+				spiritArr=spiritArr.concat(self.playerarr);
+				// console.log(spiritArr);
 
-				for(var j=0;j<self.spiritArr.length;j++){
+				for(var j=0;j<spiritArr.length;j++){
 					//判断 敌人是否碰撞敌人
-					if((Math.abs(self.enermyarr[i].x-self.spiritArr[j].x)<=33)&&(Math.abs(self.enermyarr[i].y-self.spiritArr[1].y)<=33)){
-						console.log("?");
+					if(
+						(Math.abs(self.enermyarr[i].x-spiritArr[j].x)<=32)&&(Math.abs(self.enermyarr[i].y-spiritArr[j].y)<=32)
+					){
+						// //判断自己的方向
+						// switch(self.enermyarr[i].direction){
+						// 	case "U":
+						// 		console.log("U");
+						// 		self.enermyarr[i].y=self.enermyarr[i].y+3;
+						// 		break;
+						// 	case "R":
+						// 		console.log("R");
+						// 		self.enermyarr[i].x=self.enermyarr[i].x-3;
+						// 		break;
+						// 	case "D":
+						// 		console.log("D");
+						// 		self.enermyarr[i].y=self.enermyarr[i].y-3;
+						// 		break;
+						// 	case "L":
+						// 		console.log("L");
+						// 		self.enermyarr[i].x=self.enermyarr[i].x+3;
+						// 		break;
+						// }
 						var directionArr=["U","R","D","L"];
 						self.enermyarr[i].changeDirection(directionArr[(self.enermyarr[i].directionNumber+2)%4]);	
 
 					}
 				}
-
 
 				self.enermyarr[i].update();
 				self.enermyarr[i].render();
